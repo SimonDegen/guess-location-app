@@ -1,17 +1,47 @@
-import playerList from "@/components/PlayerList";
-import { QrCode } from "@/components/QrCode";
 import { prisma } from "@/lib/prisma";
-import createLocation from "@/utils/createLocation";
-import getRandomLocationIdFromEnum from "@/utils/getRandomLocationId";
-import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export default async function JoinPage() {
-  revalidatePath("http://localhost:3000/host");
+  async function joinGame(formData: FormData) {
+    "use server";
+    const joinCode = formData.get("joinCode") as string;
+    console.log("joinCode", joinCode);
+    const obj = await prisma.games.findFirst({
+      where: { id: joinCode },
+
+      select: { players: true },
+    });
+
+    await prisma.games.update({
+      where: { id: joinCode },
+      data: {
+        players: {
+          set: [...(obj?.players || []), "testing"],
+        },
+      },
+    });
+    redirect(`/game/${joinCode}`);
+  }
 
   return (
     <>
       <div className="flex flex-col justify-center align-middle text-center flex-grow">
-        <div>Join page</div>
+        <form action={joinGame}>
+          <div className="p-8 my-4 mx-auto shadow-md max-w-2xl bg-black rounded-lg">
+            <div className="prose mb-8 mx-auto">
+              <h1>Enter join code</h1>
+            </div>
+            <input
+              type="text"
+              name="joinCode"
+              placeholder="Type here"
+              className="input input-bordered input-primary w-full max-w-xs"
+            />
+          </div>
+          <div>
+            <button className="btn btn-primary w-32">Join</button>
+          </div>
+        </form>
       </div>
     </>
   );

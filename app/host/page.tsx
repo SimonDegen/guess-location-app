@@ -1,6 +1,7 @@
 import playerList from "@/components/PlayerList";
 import { QrCode } from "@/components/QrCode";
 import { prisma } from "@/lib/prisma";
+import { GameStatusEnum } from "@/types/GameStatusEnum";
 import createLocation from "@/utils/createLocation";
 import getRandomLocationIdFromEnum from "@/utils/getRandomLocationId";
 
@@ -14,7 +15,7 @@ export default async function HostPage() {
       data: {
         id: joinCode,
         location: location,
-        status: "test",
+        status: GameStatusEnum.CREATING,
         players: "test",
       },
     })
