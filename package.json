@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "daisyui": "^3.1.9",
+    "encoding": "^0.1.13",
     "prisma": "^4.16.2"
   }
 }
