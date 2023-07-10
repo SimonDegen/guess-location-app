@@ -1,4 +1,6 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
+import GitHubProvider from "next-auth/providers/github";
+
 import clientPromise from "@/lib/connectToMongoDB";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 
@@ -34,9 +36,13 @@ export const AuthOptions: NextAuthOptions = {
       clientId: process.env.VIPPS_CLIENT_ID,
       clientSecret: process.env.VIPPS_CLIENT_SECRET,
     },
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    }),
   ],
 
-  secret: process.env.SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async session({ session }) {
       return session;

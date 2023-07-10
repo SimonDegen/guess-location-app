@@ -1,13 +1,19 @@
-import playerList from "@/components/PlayerList";
+import { PlayerList } from "@/components/PlayerList";
 import { QrCode } from "@/components/QrCode";
 import { prisma } from "@/lib/prisma";
+import { pusherClient } from "@/lib/pusher";
 import { GameStatusEnum } from "@/types/GameStatusEnum";
 import createLocation from "@/utils/createLocation";
 import getRandomLocationIdFromEnum from "@/utils/getRandomLocationId";
+import { getServerSession } from "next-auth";
+import { AuthOptions } from "../api/auth/[...nextauth]/route";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "auto";
 
 export default async function HostPage() {
+  const session = await getServerSession(AuthOptions);
+  console.log(session);
+
   const joinCode = Math.random().toString(36).substring(2, 10);
   const location = getRandomLocationIdFromEnum();
   await prisma.games
@@ -16,12 +22,13 @@ export default async function HostPage() {
         id: joinCode,
         location: location,
         status: GameStatusEnum.CREATING,
-        players: "test",
+        players: session?.user?.name || "Anonymous",
       },
     })
     .then(async () => {
       createLocation(location);
-    });
+    })
+    .finally(() => prisma.$disconnect());
 
   return (
     <>
@@ -29,7 +36,7 @@ export default async function HostPage() {
         <div>QR code for new game</div>
         <QrCode joinCode={joinCode} />
         <h1>JOIN CODE: {joinCode}</h1>
-        {playerList({ gameId: joinCode })}
+        <PlayerList gameId={joinCode} />
       </div>
     </>
   );

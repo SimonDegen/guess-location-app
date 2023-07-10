@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { pusherServer } from "@/lib/pusher";
 import { redirect } from "next/navigation";
 
 export default async function JoinPage() {
@@ -6,20 +7,28 @@ export default async function JoinPage() {
     "use server";
     const joinCode = formData.get("joinCode") as string;
     console.log("joinCode", joinCode);
-    const obj = await prisma.games.findFirst({
-      where: { id: joinCode },
+    const obj = await prisma.games
+      .findFirst({
+        where: { id: joinCode },
 
-      select: { players: true },
-    });
+        select: { players: true },
+      })
+      .finally(() => prisma.$disconnect());
 
-    await prisma.games.update({
-      where: { id: joinCode },
-      data: {
-        players: {
-          set: [...(obj?.players || []), "testing"],
+    await prisma.games
+      .update({
+        where: { id: joinCode },
+        data: {
+          players: {
+            set: [...(obj?.players || []), "testing"],
+          },
         },
-      },
+      })
+      .finally(() => prisma.$disconnect());
+    await pusherServer.trigger("GameChannel", "new-player", {
+      players: [...(obj?.players || []), "testing"],
     });
+
     redirect(`/game/${joinCode}`);
   }
 
