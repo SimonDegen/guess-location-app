@@ -22,7 +22,6 @@ export const AuthOptions: NextAuthOptions = {
         },
       },
       async profile(profile: any, tokens: any) {
-        console.log(profile);
         // You can use the tokens, in case you want to fetch more profile information
         // For example several OAuth providers do not return email by default.
         // Depending on your provider, will have tokens like `access_token`, `id_token` and or `refresh_token`

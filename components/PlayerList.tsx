@@ -14,18 +14,16 @@ export const PlayerList: React.FC<Props> = ({ gameId }) => {
     const getPlayers = async () => {
       const res = await fetch(`/api/host/${gameId}`);
       const json = await res.json();
-      console.log(json[0].players);
       setPlayers(json[0].players);
     };
     getPlayers();
 
-    pusherClient.subscribe("GameChannel");
+    pusherClient.subscribe(`GameChannel-${gameId}`);
     pusherClient.bind("new-player", (data: any) => {
-      console.log("new-player", data);
       setPlayers(data.players);
     });
     return () => {
-      pusherClient.unsubscribe("GameChannel");
+      pusherClient.unsubscribe(`GameChannel-${gameId}`);
     };
   }, []);
 

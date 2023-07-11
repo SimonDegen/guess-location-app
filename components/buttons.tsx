@@ -4,7 +4,6 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 export function SignInButtons() {
   const { data: session, status } = useSession();
-  console.log(session, status);
 
   if (status === "loading") {
     return <span className="loading loading-dots loading-xs"></span>;

@@ -6,11 +6,10 @@ export async function GET(request: NextRequest, { params }: any) {
   // const joinCode = request.nextUrl.searchParams.get("joinCode")!;
   const data = await prisma.games
     .findMany({
-      select: { players: true },
       where: { id: joinCode },
+      select: { players: true },
     })
     .finally(() => prisma.$disconnect());
-  console.log(data);
 
   return NextResponse.json(data);
 }

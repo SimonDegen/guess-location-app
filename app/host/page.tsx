@@ -12,7 +12,6 @@ export const dynamic = "auto";
 
 export default async function HostPage() {
   const session = await getServerSession(AuthOptions);
-  console.log(session);
 
   const joinCode = Math.random().toString(36).substring(2, 10);
   const location = getRandomLocationIdFromEnum();

@@ -1,12 +1,15 @@
+import addPlayerToGame from "@/lib/addPlayerToGame";
 import { prisma } from "@/lib/prisma";
 import { pusherServer } from "@/lib/pusher";
+import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { AuthOptions } from "../api/auth/[...nextauth]/route";
 
 export default async function JoinPage() {
   async function joinGame(formData: FormData) {
     "use server";
+    const session = await getServerSession(AuthOptions);
     const joinCode = formData.get("joinCode") as string;
-    console.log("joinCode", joinCode);
     const obj = await prisma.games
       .findFirst({
         where: { id: joinCode },
@@ -15,17 +18,8 @@ export default async function JoinPage() {
       })
       .finally(() => prisma.$disconnect());
 
-    await prisma.games
-      .update({
-        where: { id: joinCode },
-        data: {
-          players: {
-            set: [...(obj?.players || []), "testing"],
-          },
-        },
-      })
-      .finally(() => prisma.$disconnect());
-    await pusherServer.trigger("GameChannel", "new-player", {
+    await addPlayerToGame(joinCode, session?.user?.name as string);
+    await pusherServer.trigger(`GameChannel-${joinCode}`, "new-player", {
       players: [...(obj?.players || []), "testing"],
     });
 
