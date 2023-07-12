@@ -3,6 +3,7 @@
 type Props = {
   location: string;
 };
+declare const window: any;
 
 export const ShowLocationButton: React.FC<Props> = ({ location }) => {
   return (
