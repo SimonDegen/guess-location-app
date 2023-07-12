@@ -6,7 +6,6 @@ import { SignInCard } from "./SignInCard";
 export default function AuthCheck({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
 
-  console.log(session, status);
 
   if (status === "loading")
     return (

@@ -1,38 +1,25 @@
-import { AuthOptions } from "@/app/api/auth/[...nextauth]/route";
-import addPlayerToGame from "@/lib/addPlayerToGame";
-import { prisma } from "@/lib/prisma";
-import { pusherServer } from "@/lib/pusher";
+import LobbyPage from "@/components/game/lobby/LobbyPage";
+import OngoingGamePage from "@/components/game/ongoingGame/OngoingGame";
+import getGameByJoinCode from "@/lib/getGameByJoinCode";
 import { GameStatusEnum } from "@/types/GameStatusEnum";
-import { getServerSession } from "next-auth";
 
 export default async function GamePage({
   params,
 }: {
   params: { joinCode: string };
 }) {
-  const session = await getServerSession(AuthOptions);
-  if (session && session.user) {
-    const joinCode = params.joinCode;
-    const currentGame = await prisma.games
-      .findFirst({ where: { id: joinCode } })
-      .finally(() => {
-        prisma.$disconnect();
-      });
-
-    if (
-      !currentGame?.players?.includes(session.user.name as string) &&
-      currentGame?.status === GameStatusEnum.CREATING
-    ) {
-      await addPlayerToGame(joinCode, session.user.name as string);
-      await pusherServer.trigger(`GameChannel-${joinCode}`, "new-player", {
-        players: [...(currentGame?.players || []), session?.user?.name],
-      });
-    }
-  
-    if (currentGame === null) {
-      return <>Current game could not be found</>;
-    }
-
-    return <div>You are waiting for the game to start</div>;
+  const joinCode = params.joinCode;
+  const game = await getGameByJoinCode(params.joinCode);
+  let gameStatus = game?.status;
+  if (gameStatus === GameStatusEnum.CREATING) {
+    return <div>{LobbyPage(joinCode)}</div>;
+  }
+  if (gameStatus === GameStatusEnum.ONGOING) {
+    return <div>{OngoingGamePage(joinCode)}</div>;
+  }
+  if (gameStatus === GameStatusEnum.FINISHED) {
+    return <div>The game has finished</div>;
+  } else {
+    return <div>Game not found</div>;
   }
 }

@@ -1,5 +1,6 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
 import clientPromise from "@/lib/connectToMongoDB";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
@@ -39,6 +40,17 @@ export const AuthOptions: NextAuthOptions = {
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
+    }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
@@ -46,7 +58,7 @@ export const AuthOptions: NextAuthOptions = {
       return session;
     },
   },
-  debug:true
+  debug: true,
 };
 
 const handler = NextAuth(AuthOptions);

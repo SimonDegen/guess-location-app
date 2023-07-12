@@ -19,9 +19,6 @@ export default async function JoinPage() {
       .finally(() => prisma.$disconnect());
 
     await addPlayerToGame(joinCode, session?.user?.name as string);
-    await pusherServer.trigger(`GameChannel-${joinCode}`, "new-player", {
-      players: [...(obj?.players || []), "testing"],
-    });
 
     redirect(`/game/${joinCode}`);
   }

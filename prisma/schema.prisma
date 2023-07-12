@@ -26,10 +26,11 @@ model gameRooms {
 }
 
 model games {
-  id       String   @id @map("_id")
-  location String
-  players  String[]
-  status   String
+  id         String   @id @map("_id")
+  location   String
+  players    String[]
+  status     String
+  currentSpy String
 }
 
 model locations {

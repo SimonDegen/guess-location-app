@@ -1,18 +1,21 @@
 import { PlayerList } from "@/components/PlayerList";
 import { QrCode } from "@/components/QrCode";
 import { prisma } from "@/lib/prisma";
-import { pusherClient } from "@/lib/pusher";
 import { GameStatusEnum } from "@/types/GameStatusEnum";
 import createLocation from "@/utils/createLocation";
 import getRandomLocationIdFromEnum from "@/utils/getRandomLocationId";
 import { getServerSession } from "next-auth";
 import { AuthOptions } from "../api/auth/[...nextauth]/route";
+import updateGameStatus from "@/lib/updateGameStatus";
+import { redirect } from "next/navigation";
+import { pusherServer } from "@/lib/pusher";
+import selectAndSetSpy from "@/lib/selectAndSetSpy";
 
 export const dynamic = "auto";
 
 export default async function HostPage() {
   const session = await getServerSession(AuthOptions);
-
+  await prisma.games.deleteMany({});
   const joinCode = Math.random().toString(36).substring(2, 10);
   const location = getRandomLocationIdFromEnum();
   await prisma.games
@@ -22,12 +25,21 @@ export default async function HostPage() {
         location: location,
         status: GameStatusEnum.CREATING,
         players: session?.user?.name || "Anonymous",
+        currentSpy: "",
       },
     })
     .then(async () => {
       createLocation(location);
     })
     .finally(() => prisma.$disconnect());
+
+  async function startGame() {
+    "use server";
+    await updateGameStatus(joinCode, GameStatusEnum.ONGOING);
+    await selectAndSetSpy(joinCode)
+    pusherServer.trigger(`GameChannel-${joinCode}`, "start-game", {});
+    redirect(`/game/${joinCode}`);
+  }
 
   return (
     <>
@@ -36,6 +48,13 @@ export default async function HostPage() {
         <QrCode joinCode={joinCode} />
         <h1>JOIN CODE: {joinCode}</h1>
         <PlayerList gameId={joinCode} />
+        <div>
+          <form action={startGame}>
+            <button className="btn btn-primary w-32" type="submit">
+              Start game
+            </button>
+          </form>
+        </div>
       </div>
     </>
   );
