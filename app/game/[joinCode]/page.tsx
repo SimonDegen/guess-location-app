@@ -1,4 +1,5 @@
 import { AuthOptions } from "@/app/api/auth/[...nextauth]/route";
+import { ShowSpy } from "@/components/game/gameOver/ShowSpy";
 import LobbyPage from "@/components/game/lobby/LobbyPage";
 import OngoingGamePage from "@/components/game/ongoingGame/OngoingGame";
 import getGameByJoinCode from "@/lib/getGameByJoinCode";
@@ -22,7 +23,11 @@ export default async function GamePage({
       return <div>{OngoingGamePage(joinCode)}</div>;
     }
     if (gameStatus === GameStatusEnum.FINISHED) {
-      return <div>The game has finished</div>;
+      return (
+        <div>
+          <ShowSpy currentSpy={game.currentSpy} location={game.location} />
+        </div>
+      );
     }
   }
   return <div>Game not found</div>;
