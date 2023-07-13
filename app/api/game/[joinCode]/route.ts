@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest, { params }: any) {
   const joinCode = params.joinCode;
   // const joinCode = request.nextUrl.searchParams.get("joinCode")!;
-  const data = await prisma.games
+  await prisma.games
     .update({
       where: { id: joinCode },
       data: {
@@ -15,5 +15,4 @@ export async function GET(request: NextRequest, { params }: any) {
     })
     .then(() => prisma.$disconnect());
   pusherServer.trigger(`GameChannel-${joinCode}`, "game-finished", {});
-  return NextResponse.json(data);
 }
