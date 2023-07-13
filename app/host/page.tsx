@@ -37,7 +37,7 @@ export default async function HostPage() {
 
   async function startGame() {
     "use server";
-    Promise.all([
+    await Promise.all([
       updateGameStatus(joinCode, GameStatusEnum.ONGOING),
       selectAndSetSpy(joinCode),
       updateStartTime(joinCode),
