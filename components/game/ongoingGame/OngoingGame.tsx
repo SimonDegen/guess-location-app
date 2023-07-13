@@ -23,8 +23,9 @@ export default async function OngoingGamePage(joinCode: string) {
 
   const countDownEnd = async () => {
     "use server";
-    await updateGameStatus(joinCode, GameStatusEnum.FINISHED);
-    pusherServer.trigger(`GameChannel-${joinCode}`, "time-end", {});
+    await updateGameStatus(joinCode, GameStatusEnum.FINISHED).then(() => {
+      pusherServer.trigger(`GameChannel-${joinCode}`, "time-end", {});
+    });
   };
 
   return (
