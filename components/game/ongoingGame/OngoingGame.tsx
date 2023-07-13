@@ -22,7 +22,7 @@ export default async function OngoingGamePage(joinCode: string) {
   const countDownEnded = async () => {
     "use server";
     await updateGameStatus(joinCode, GameStatusEnum.FINISHED).finally(() => {
-      pusherServer.trigger(`GameChannel-${joinCode}`, "game-finished", {});
+      pusherServer.trigger(`gameFinished-${joinCode}`, "game-finished", {});
     });
   };
 
