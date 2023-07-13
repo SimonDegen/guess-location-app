@@ -1,8 +1,5 @@
 "use client";
 
-import { pusherClient } from "@/lib/pusher";
-import { useRouter } from "next/navigation";
-
 type Props = {
   location: string;
   joinCode: string;
@@ -10,13 +7,6 @@ type Props = {
 declare const window: any;
 
 export const ShowLocationButton: React.FC<Props> = ({ location, joinCode }) => {
-  const router = useRouter();
-  pusherClient.subscribe(`GameChannel-${joinCode}`);
-  pusherClient.bind("time-end", () => {
-    console.log("time-end");
-    router.refresh();
-  });
-
   return (
     <>
       <button

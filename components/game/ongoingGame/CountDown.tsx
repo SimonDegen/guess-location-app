@@ -1,15 +1,16 @@
 "use client";
-import { pusherClient } from "@/lib/pusher";
-import { useState } from "react";
 
 type Props = {
+  joinCode: string;
   startDate: Date;
-  countDownEnd: () => void;
 };
 
+import { pusherClient } from "@/lib/pusher";
+import { useRouter } from "next/navigation";
 import React from "react";
 
-export const CountDown: React.FC<Props> = ({ startDate, countDownEnd }) => {
+export const CountDown: React.FC<Props> = ({ startDate, joinCode }) => {
+  const router = useRouter();
   const diff = 1;
 
   var countDownDate = startDate.getTime() + diff * 60000;
@@ -34,10 +35,14 @@ export const CountDown: React.FC<Props> = ({ startDate, countDownEnd }) => {
 
     // If the count down is finished, write some text
     if (distance <= 0) {
-      countDownEnd();
+      fetch(`/api/game/${joinCode}`, {});
       clearInterval(x);
     }
   }, 1000);
+  pusherClient.subscribe("GameChannel-" + joinCode);
+  pusherClient.bind("game-finished", () => {
+    router.refresh();
+  });
   return (
     <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
       <div className="flex flex-col p-2 bg-neutral rounded-box text-neutral-content">
