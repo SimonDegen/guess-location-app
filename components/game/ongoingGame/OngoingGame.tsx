@@ -1,4 +1,3 @@
-"use server";
 import { AuthOptions } from "@/app/api/auth/[...nextauth]/route";
 import getSpy from "@/lib/getSpy";
 import { getServerSession } from "next-auth";
@@ -7,6 +6,9 @@ import getLocation from "@/lib/getLocation";
 import getStartDate from "@/lib/getStartTime";
 import { CountDown } from "./CountDown";
 import { ShowAllLocationsButton } from "./ShowAllLocationsButton";
+import updateGameStatus from "@/lib/updateGameStatus";
+import { GameStatusEnum } from "@/types/GameStatusEnum";
+import { pusherServer } from "@/lib/pusher";
 
 export default async function OngoingGamePage(joinCode: string) {
   const session = await getServerSession(AuthOptions);
@@ -17,10 +19,21 @@ export default async function OngoingGamePage(joinCode: string) {
     currentLocation = (await getLocation(joinCode)) || "";
   }
 
+  const countDownEnded = async () => {
+    "use server";
+    await updateGameStatus(joinCode, GameStatusEnum.FINISHED).finally(() => {
+      pusherServer.trigger(`GameChannel-${joinCode}`, "game-finished", {});
+    });
+  };
+
   return (
     <div className="hero min-h-screen bg-base-200">
       <div className="hero-content text-center flex-col">
-        <CountDown startDate={startDate!} joinCode={joinCode} />
+        <CountDown
+          startDate={startDate!}
+          joinCode={joinCode}
+          countDownEnded={countDownEnded}
+        />
         <div className="max-w-md">
           <h1 className="text-5xl font-bold">
             The game has started press the button below to see the location

@@ -3,13 +3,18 @@
 type Props = {
   joinCode: string;
   startDate: Date;
+  countDownEnded: () => void;
 };
 
 import { pusherClient } from "@/lib/pusher";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 
-export const CountDown: React.FC<Props> = ({ startDate, joinCode }) => {
+export const CountDown: React.FC<Props> = ({
+  startDate,
+  joinCode,
+  countDownEnded,
+}) => {
   const router = useRouter();
   const diff = 1;
 
@@ -35,14 +40,17 @@ export const CountDown: React.FC<Props> = ({ startDate, joinCode }) => {
 
     // If the count down is finished, write some text
     if (distance <= 0) {
-      fetch(`/api/game/${joinCode}`, {});
+      countDownEnded();
       clearInterval(x);
     }
   }, 1000);
-  pusherClient.subscribe("GameChannel-" + joinCode);
-  pusherClient.bind("game-finished", () => {
-    router.refresh();
-  });
+
+  useEffect(() => {
+    pusherClient.subscribe("GameChannel-" + joinCode);
+    pusherClient.bind("game-finished", () => {
+      router.refresh();
+    });
+  }, []);
   return (
     <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
       <div className="flex flex-col p-2 bg-neutral rounded-box text-neutral-content">
