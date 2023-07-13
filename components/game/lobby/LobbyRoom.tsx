@@ -11,9 +11,6 @@ export const LobbyRoom = ({ joinCode }: { joinCode: string }) => {
     pusherClient.bind("start-game", () => {
       router.refresh();
     });
-    return () => {
-      pusherClient.unsubscribe(`GameChannel-${joinCode}`);
-    };
   }, []);
   return <>You have joined the game. Waiting for host to start the game</>;
 };
