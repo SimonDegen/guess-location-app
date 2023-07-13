@@ -10,6 +10,7 @@ import updateGameStatus from "@/lib/updateGameStatus";
 import { redirect } from "next/navigation";
 import { pusherServer } from "@/lib/pusher";
 import selectAndSetSpy from "@/lib/selectAndSetSpy";
+import updateStartTime from "@/lib/updateStartTime";
 
 export const dynamic = "auto";
 
@@ -26,6 +27,7 @@ export default async function HostPage() {
         status: GameStatusEnum.CREATING,
         players: session?.user?.name || "Anonymous",
         currentSpy: "",
+        startedAt: new Date(),
       },
     })
     .then(async () => {
@@ -36,7 +38,8 @@ export default async function HostPage() {
   async function startGame() {
     "use server";
     await updateGameStatus(joinCode, GameStatusEnum.ONGOING);
-    await selectAndSetSpy(joinCode)
+    await selectAndSetSpy(joinCode);
+    await updateStartTime(joinCode);
     pusherServer.trigger(`GameChannel-${joinCode}`, "start-game", {});
     redirect(`/game/${joinCode}`);
   }

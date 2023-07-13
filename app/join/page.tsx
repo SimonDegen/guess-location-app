@@ -4,6 +4,7 @@ import { pusherServer } from "@/lib/pusher";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { AuthOptions } from "../api/auth/[...nextauth]/route";
+import { JoinCodeForm } from "@/components/join/joinCodeForm";
 
 export default async function JoinPage() {
   async function joinGame(formData: FormData) {
@@ -17,31 +18,20 @@ export default async function JoinPage() {
         select: { players: true },
       })
       .finally(() => prisma.$disconnect());
-
-    await addPlayerToGame(joinCode, session?.user?.name as string);
-
-    redirect(`/game/${joinCode}`);
+    if (obj) {
+      await addPlayerToGame(joinCode, session?.user?.name as string);
+      redirect(`/game/${joinCode}`);
+    } else {
+      return {
+        error: "Game not found",
+      };
+    }
   }
 
   return (
     <>
       <div className="flex flex-col justify-center align-middle text-center flex-grow">
-        <form action={joinGame}>
-          <div className="p-8 my-4 mx-auto shadow-md max-w-2xl bg-black rounded-lg">
-            <div className="prose mb-8 mx-auto">
-              <h1>Enter join code</h1>
-            </div>
-            <input
-              type="text"
-              name="joinCode"
-              placeholder="Type here"
-              className="input input-bordered input-primary w-full max-w-xs"
-            />
-          </div>
-          <div>
-            <button className="btn btn-primary w-32">Join</button>
-          </div>
-        </form>
+        <JoinCodeForm serverAction={joinGame} />
       </div>
     </>
   );

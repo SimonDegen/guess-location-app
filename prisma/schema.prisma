@@ -31,6 +31,7 @@ model games {
   players    String[]
   status     String
   currentSpy String
+  startedAt  DateTime
 }
 
 model locations {
