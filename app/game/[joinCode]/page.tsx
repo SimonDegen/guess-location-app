@@ -14,11 +14,11 @@ export default async function GamePage({
   const session = await getServerSession(AuthOptions);
   const joinCode = params.joinCode;
   const game = await getGameByJoinCode(params.joinCode);
+  let gameStatus = game?.status;
+  if (gameStatus === GameStatusEnum.CREATING) {
+    return <div>{LobbyPage(joinCode)}</div>;
+  }
   if (game?.players.includes(session?.user?.name || "")) {
-    let gameStatus = game?.status;
-    if (gameStatus === GameStatusEnum.CREATING) {
-      return <div>{LobbyPage(joinCode)}</div>;
-    }
     if (gameStatus === GameStatusEnum.ONGOING) {
       return <div>{OngoingGamePage(joinCode)}</div>;
     }

@@ -10,7 +10,7 @@ type Props = {
 import React from "react";
 
 export const CountDown: React.FC<Props> = ({ startDate, countDownEnd }) => {
-  const diff = 5;
+  const diff = 1;
 
   var countDownDate = startDate.getTime() + diff * 60000;
   // Update the count down every 1 second

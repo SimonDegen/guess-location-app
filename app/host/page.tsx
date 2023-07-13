@@ -37,9 +37,11 @@ export default async function HostPage() {
 
   async function startGame() {
     "use server";
-    await updateGameStatus(joinCode, GameStatusEnum.ONGOING);
-    await selectAndSetSpy(joinCode);
-    await updateStartTime(joinCode);
+    Promise.all([
+      updateGameStatus(joinCode, GameStatusEnum.ONGOING),
+      selectAndSetSpy(joinCode),
+      updateStartTime(joinCode),
+    ]);
     pusherServer.trigger(`GameChannel-${joinCode}`, "start-game", {});
     redirect(`/game/${joinCode}`);
   }
