@@ -22,9 +22,6 @@ export const PlayerList: React.FC<Props> = ({ gameId }) => {
     pusherClient.bind("new-player", (data: any) => {
       setPlayers(data.players);
     });
-    return () => {
-      pusherClient.unsubscribe(`GameChannel-${gameId}`);
-    };
   }, []);
 
   return (

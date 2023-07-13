@@ -2,7 +2,6 @@
 
 import { pusherClient } from "@/lib/pusher";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 type Props = {
   location: string;
@@ -12,15 +11,11 @@ declare const window: any;
 
 export const ShowLocationButton: React.FC<Props> = ({ location, joinCode }) => {
   const router = useRouter();
-  useEffect(() => {
-    pusherClient.subscribe(`GameChannel-${joinCode}`);
-    pusherClient.bind("time-end", () => {
-      router.refresh();
-    });
-    return () => {
-      pusherClient.disconnect();
-    };
-  }, []);
+  pusherClient.subscribe(`GameChannel-${joinCode}`);
+  pusherClient.bind("time-end", () => {
+    console.log("time-end");
+    router.refresh();
+  });
 
   return (
     <>
@@ -28,7 +23,7 @@ export const ShowLocationButton: React.FC<Props> = ({ location, joinCode }) => {
         className="btn btn-primary"
         onClick={() => window.my_modal_2.showModal()}
       >
-        open modal
+        Show location for this game
       </button>
       <dialog id="my_modal_2" className="modal">
         <form method="dialog" className="modal-box">

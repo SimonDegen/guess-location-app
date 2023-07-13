@@ -7,8 +7,8 @@ import getStartDate from "@/lib/getStartTime";
 import { CountDown } from "./CountDown";
 import updateGameStatus from "@/lib/updateGameStatus";
 import { GameStatusEnum } from "@/types/GameStatusEnum";
-import { revalidatePath } from "next/cache";
 import { pusherServer } from "@/lib/pusher";
+import { ShowAllLocationsButton } from "./ShowAllLocationsButton";
 
 export const dynamic = "force-dynamic";
 
@@ -36,10 +36,14 @@ export default async function OngoingGamePage(joinCode: string) {
             The game has started press the button below to see the location
           </h1>
           <p className="py-6"></p>
-          <ShowLocationButton
-            location={currentLocation || ""}
-            joinCode={joinCode}
-          />
+          <div className="flex gap-4 justify-center align-middle flex-wrap">
+            <ShowLocationButton
+              location={currentLocation || ""}
+              joinCode={joinCode}
+            />
+
+            <ShowAllLocationsButton />
+          </div>
         </div>
       </div>
     </div>
