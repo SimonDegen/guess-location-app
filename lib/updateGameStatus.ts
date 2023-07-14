@@ -5,12 +5,10 @@ export default async function updateGameStatus(
   joinCode: string,
   gameStatus: GameStatusEnum
 ) {
-  await prisma.games
-    .update({
-      where: { id: joinCode },
-      data: {
-        status: gameStatus,
-      },
-    })
-    .finally(() => prisma.$disconnect());
+  await prisma.games.update({
+    where: { id: joinCode },
+    data: {
+      status: gameStatus,
+    },
+  });
 }

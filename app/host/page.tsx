@@ -7,16 +7,15 @@ import getRandomLocationIdFromEnum from "@/utils/getRandomLocationId";
 import { getServerSession } from "next-auth";
 import { AuthOptions } from "../api/auth/[...nextauth]/route";
 import updateGameStatus from "@/lib/updateGameStatus";
-import { redirect } from "next/navigation";
-import { pusherServer } from "@/lib/pusher";
 import selectAndSetSpy from "@/lib/selectAndSetSpy";
 import updateStartTime from "@/lib/updateStartTime";
+import { pusherServer } from "@/lib/pusher";
+import { redirect } from "next/navigation";
 
 export const dynamic = "auto";
 
 export default async function HostPage() {
   const session = await getServerSession(AuthOptions);
-  await prisma.games.deleteMany({});
   const joinCode = Math.random().toString(36).substring(2, 10);
   const location = getRandomLocationIdFromEnum();
   await prisma.games
@@ -41,7 +40,7 @@ export default async function HostPage() {
       updateGameStatus(joinCode, GameStatusEnum.ONGOING),
       selectAndSetSpy(joinCode),
       updateStartTime(joinCode),
-    ]);
+    ]).finally(() => prisma.$disconnect());
     pusherServer.trigger(`GameChannel-${joinCode}`, "start-game", {});
     redirect(`/game/${joinCode}`);
   }

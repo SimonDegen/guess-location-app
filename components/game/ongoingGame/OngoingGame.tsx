@@ -9,6 +9,7 @@ import { ShowAllLocationsButton } from "./ShowAllLocationsButton";
 import updateGameStatus from "@/lib/updateGameStatus";
 import { GameStatusEnum } from "@/types/GameStatusEnum";
 import { pusherServer } from "@/lib/pusher";
+import { prisma } from "@/lib/prisma";
 
 export default async function OngoingGamePage(joinCode: string) {
   const session = await getServerSession(AuthOptions);
@@ -21,9 +22,11 @@ export default async function OngoingGamePage(joinCode: string) {
 
   const countDownEnded = async () => {
     "use server";
+    console.log("are we ever in here?");
     await updateGameStatus(joinCode, GameStatusEnum.FINISHED).finally(() => {
-      pusherServer.trigger(`gameFinished-${joinCode}`, "game-finished", {});
+      prisma.$disconnect();
     });
+    pusherServer.trigger(`gameFinished-${joinCode}`, "game-finished", {});
   };
 
   return (
