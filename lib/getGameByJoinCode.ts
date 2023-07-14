@@ -5,6 +5,6 @@ export default async function getGameByJoinCode(joinCode: string) {
     .findUnique({
       where: { id: joinCode },
     })
-    .finally(() => prisma.$disconnect());
+    .finally(() => {prisma.$disconnect()});
   return game;
 }
