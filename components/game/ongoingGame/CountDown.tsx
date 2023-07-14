@@ -16,7 +16,7 @@ export const CountDown: React.FC<Props> = ({
   countDownEnded,
 }) => {
   const router = useRouter();
-  const diff = 1;
+  const diff = 5;
 
   var countDownDate = startDate.getTime() + diff * 60000;
   // Update the count down every 1 second
