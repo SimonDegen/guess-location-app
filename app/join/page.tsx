@@ -1,6 +1,5 @@
 import addPlayerToGame from "@/lib/addPlayerToGame";
 import { prisma } from "@/lib/prisma";
-import { pusherServer } from "@/lib/pusher";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { AuthOptions } from "../api/auth/[...nextauth]/route";

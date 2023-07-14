@@ -26,7 +26,7 @@ export default async function OngoingGamePage(joinCode: string) {
     await updateGameStatus(joinCode, GameStatusEnum.FINISHED).finally(() => {
       prisma.$disconnect();
     });
-    pusherServer.trigger(`gameFinished-${joinCode}`, "game-finished", {});
+    pusherServer.trigger(`GameChannel-${joinCode}`, "game-finished", {});
   };
 
   return (

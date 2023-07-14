@@ -46,7 +46,7 @@ export const CountDown: React.FC<Props> = ({
   }, 1000);
 
   useEffect(() => {
-    pusherClient.subscribe("gameFinished-" + joinCode);
+    pusherClient.subscribe("GameChannel-" + joinCode);
     pusherClient.bind("game-finished", () => {
       router.refresh();
     });
